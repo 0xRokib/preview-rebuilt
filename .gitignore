@@ -1,0 +1,15 @@
+.build/
+.swiftpm/
+dist/
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+*.p12
+*.p8
+*.pem
+*.key
+# Local artifact-analysis output; not licensed for redistribution.
+Research/
