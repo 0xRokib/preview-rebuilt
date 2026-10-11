@@ -11,7 +11,7 @@ bash scripts/build-app.sh
 open "dist/Preview Rebuilt.app"
 ```
 
-See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Privacy](PRIVACY.md), and [release readiness](RELEASE_READINESS.md). No prebuilt public binary is currently provided. Builds are ad-hoc signed unless you configure your own Developer ID.
+See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Privacy](PRIVACY.md), and [release readiness](RELEASE_READINESS.md). An [experimental Apple Silicon DMG prerelease](https://github.com/0xRokib/preview-rebuilt/releases/tag/v0.1.0-experimental) is available. It is ad-hoc signed and **not notarized**; Gatekeeper may block it. Do not disable security checks to bypass rejection; build from reviewed source instead. Builds are ad-hoc signed unless you configure your own Developer ID.
 
 Independent native macOS PDF/image viewer built with Swift, AppKit, and PDFKit. This is a scoped first version, not a complete clone or recovered Apple source. Apple Preview and original documents remain untouched.
 
