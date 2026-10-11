@@ -1,8 +1,78 @@
 # Preview Rebuilt
 
-Experimental · Native macOS · MIT licensed
+[![macOS CI](https://github.com/0xRokib/preview-rebuilt/actions/workflows/ci.yml/badge.svg)](https://github.com/0xRokib/preview-rebuilt/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Independent open-source project. Not affiliated with or endorsed by Apple. Source publication is not a production binary release.
+An independent, open-source PDF and image viewer for macOS, built with Swift, AppKit, PDFKit, ImageIO, Core Image, and Vision.
+
+**Experimental. Not a complete Apple Preview replacement or production-certified application.** Not affiliated with or endorsed by Apple. No Apple source, binary, or artwork is included.
+
+## Download and install
+
+**[Download v0.1.0 experimental DMG — Apple Silicon](https://github.com/0xRokib/preview-rebuilt/releases/download/v0.1.0-experimental/Preview-Rebuilt-0.1.0-experimental-arm64.dmg)**
+
+[Release notes and SHA-256 checksum](https://github.com/0xRokib/preview-rebuilt/releases/tag/v0.1.0-experimental)
+
+1. Download the DMG and, optionally, its `.sha256` checksum file.
+2. Open the DMG and read `READ-ME-FIRST.txt`.
+3. Drag **Preview Rebuilt.app** to the **Applications** shortcut.
+4. Eject the disk image and launch the app from Applications.
+
+**This prerelease is ad-hoc signed, not Developer ID signed or notarized. macOS Gatekeeper may block it. Do not disable Gatekeeper or remove quarantine to bypass a failed security assessment. If blocked, build from reviewed source instead.**
+
+The downloadable binary supports **Apple Silicon (arm64) only**. macOS 13 is the declared minimum, but compatibility on older supported OS versions has not been verified. No Intel binary is provided.
+
+To verify the download, put the DMG and checksum file in the same directory, then run:
+
+```bash
+shasum -a 256 -c Preview-Rebuilt-0.1.0-experimental-arm64.dmg.sha256
+```
+
+A matching checksum verifies file integrity, not notarization or application safety.
+
+## Features
+
+### PDF viewing and editing
+
+- Native windows, multiple documents, Open dialogs, and Finder file-open handling
+- Thumbnails, page navigation, zoom/fit, single-page/continuous/two-page modes, and full screen
+- Text search, go-to-page, and document information
+- Insert blank pages, merge pages from PDF/image files, move pages earlier/later, delete with a final-page guard, and extract the current page
+- Clockwise rotation, text highlights, underline, strike-through, and text notes
+- Rectangle, ellipse, and arrow markup; annotation selection, deletion, and numeric move/resize dialogs
+- Secure password-opening prompts, core edit/copy permission guards, and password-protected PDF-copy export
+- App-managed edit undo with saved-state tracking and unsaved-edit warnings
+
+### Images and text recognition
+
+- Static image decoding with EXIF orientation normalization and native raster backing
+- Numeric crop/resize, horizontal/vertical flip, exposure, contrast, and saturation adjustment
+- PNG, JPEG, TIFF, and HEIC export
+- Local page OCR using Apple Vision, with recognized-text copying
+
+### macOS integration
+
+- Native print and PDF-copy sharing commands
+- Atomic copy exports and original-file path/symlink/hardlink protection
+- File/page/pixel limits and private temporary sharing copies
+
+Interactive dialogs, printing/sharing, accessibility, and native PDF widget behavior still need further QA. See the [feature checklist](FEATURE_CHECKLIST.md) for implementation and verification details.
+
+## Important limitations
+
+- **Back up your documents.** App-managed edits stay in memory until explicitly exported and can be lost in a crash. No autosave or redo.
+- Original documents are not automatically saved. PDF export creates a copy; ordinary source-path aliases are rejected. This is not protection against concurrent hostile filesystem changes.
+- Raster editing/export requires a single unannotated, unrotated image to avoid dropping PDF edits. Images are displayed through PDF pages.
+- Notes start at page center; annotation repositioning is numeric, not direct dragging.
+- No verified redaction, signatures, freehand drawing, drag crop/selection, DPI/ICC controls, permission editor, multi-page selection/drag, iCloud integration, or 3D viewing.
+- OCR returns text but does not add a searchable text layer to the PDF.
+- Native PDF widget edits are not fully audited for permission enforcement or unsaved-state tracking.
+- PDF parsing/search/export can block the UI. Resource caps do not provide parser isolation. The app is not sandboxed.
+- Sharing services may transmit documents, and crashes may leave temporary share copies. See [Privacy](PRIVACY.md).
+
+## Build from source
+
+Requires macOS 13 or later and a Swift 5.9+ toolchain. Full Xcode is recommended for XCTest. No third-party runtime dependencies.
 
 ```bash
 git clone https://github.com/0xRokib/preview-rebuilt.git
@@ -11,76 +81,51 @@ bash scripts/build-app.sh
 open "dist/Preview Rebuilt.app"
 ```
 
-See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Privacy](PRIVACY.md), and [release readiness](RELEASE_READINESS.md). An [experimental Apple Silicon DMG prerelease](https://github.com/0xRokib/preview-rebuilt/releases/tag/v0.1.0-experimental) is available. It is ad-hoc signed and **not notarized**; Gatekeeper may block it. Do not disable security checks to bypass rejection; build from reviewed source instead. Builds are ad-hoc signed unless you configure your own Developer ID.
+Default builds are locally ad-hoc signed and not notarized. Building from source does not certify security or compatibility. The app has no built-in analytics or network client; macOS sharing and printing can use network destinations.
 
-Independent native macOS PDF/image viewer built with Swift, AppKit, and PDFKit. This is a scoped first version, not a complete clone or recovered Apple source. Apple Preview and original documents remain untouched.
-
-## Run
+To package an experimental arm64 DMG after building:
 
 ```bash
-open "dist/Preview Rebuilt.app"
+bash scripts/build-experimental-dmg.sh
 ```
 
-## Build
+The script refuses to overwrite an existing DMG. Output is under `dist/`, which is excluded from Git.
 
-```bash
-bash scripts/build-app.sh
-```
-
-Requires macOS and Swift command-line tools. The bundle is locally ad-hoc signed, not notarized or sandboxed. Built and tested on this Mac (arm64, macOS 27 SDK); macOS 13 compatibility is declared but not verified on an older OS. No third-party dependencies. No network calls.
-
-## Included
-
-- Native windows, File/Open, Finder file-open handling, multiple windows
-- PDF viewing and OS-supported static image import via NSImage
-- PDF thumbnails, continuous scrolling, previous/next page, zoom, fit
-- Clockwise page rotation; selected-text highlights; centered free-text notes
-- In-memory edit undo
-- Pages menu: blank insertion, merge PDF/image file pages, move earlier/later, delete (last-page guard), extract current page
-- Secure password opening with retry/cancel and core edit/copy permission guards
-- Numeric image crop/resize, flips, exposure/contrast/saturation, PNG/JPEG/TIFF/HEIC export
-- Rectangle/ellipse/arrow, underline/strike-through, annotation delete/move/resize dialogs
-- Page display modes, go-to-page, full screen, document information
-- Vision page OCR and copy, protected PDF export, native print/share commands (interactive workflows unverified)
-- PDF text search (Return searches; raster image text is not OCR-indexed)
-- Export to a PDF copy, atomic writes, same-source-path overwrite guard
-- Unsaved-edit warnings before replacing a document, closing, or quitting
-
-Images have a native raster backing displayed through PDF pages; raster edits/export require a single unannotated, unrotated image to prevent dropping PDF edits. Notes start at page center and can be repositioned numerically. Undo covers app-managed edits and tracks saved-state identity; no redo. Native PDF widget edits require further lifecycle auditing. Original source files are not automatically saved.
-
-## Release readiness
-
-Hardened development build, not approved for public distribution. See `RELEASE_READINESS.md` for fixes, tests, and blocking release gates. Run `bash scripts/verify.sh` for repeatable automated checks. Developer ID signing is optional through `SIGNING_IDENTITY`; notarization, sandbox policy and manual QA remain outstanding.
-
-## Not included
-
-Drag cropping/selection, DPI/ICC controls, signatures, freehand drawing, permission editor, redo, verified redaction, multi-page selection/drag, 3D files, iCloud integration, full Preview menu/toolbar parity, or Apple artwork. These are future work, not claimed features. See `FEATURE_CHECKLIST.md` for the evidence-backed stage plan and verification ledger.
-
-## Evidence and provenance
-
-REA opened `/System/Applications/Preview.app/Contents/MacOS/Preview` as arm64 Mach-O with SHA-256 `9750218836c974537f8d9b671b90f47b986bb1a66320613d8fbd682862eb9c33`.
-
-REA `inspect_plist` evidence `ev_cef020127639f4e0db3bb7375871b4be115062ab3f31250235757effa0dc4910` observed Preview version 11.0 (1147), PDF document class `PVPDFPageContainer`, and image class `PVImageContainer`, plus declared editor/viewer types. Complete evidence is retained locally and excluded from the public repository; it is not distributed under the MIT license. Plist declarations establish advertised types, not runtime behavior.
-
-REA also parsed Preview's shipped MainMenu localization table: evidence `ev_76192e5f34beea3d94c725664044f592839513b7a2d8bf300077e8a729d9d7a1`, retained locally (raw Apple-derived evidence is excluded from the public repository). Menu labels inform the feature checklist but do not establish runtime behavior.
-
-Deep analysis was unavailable: Ghidra not configured, Hopper launcher absent, IDA not configured. No Apple implementation was decompiled. Our architecture and feature choices are independent design decisions; UI parity was not measured against a running Apple Preview.
-
-## License
-
-Original project source and documentation are licensed under [MIT](LICENSE). Apple frameworks, trademarks and other third-party materials remain subject to their respective rights; no Apple binary, source or artwork is included. Local artifact-analysis outputs are excluded from publication.
-
-## Verification
+## Tests and verification
 
 ```bash
 swift build --product PreviewRebuilt
+swift test
 swift run PreviewSmoke
-PREVIEW_FIXTURE_DIR="$PWD/.build/fixtures" swift run PreviewSmoke
-bash scripts/build-app.sh
-"dist/Preview Rebuilt.app/Contents/MacOS/PreviewRebuilt" --ui-smoke-test "$PWD/.build/fixtures/sample.pdf"
-swift test # requires a toolchain supplying XCTest (full Xcode on this host)
+python3 scripts/test-release-gates.py
+# Includes release bundle and native-window smoke checks; requires a desktop session:
+bash scripts/verify.sh
 ```
 
-Passed on this host: debug build, release bundle build, core smoke checks (rotation wrap, load/export, annotation persistence, unchanged source bytes, TIFF import, invalid-file rejection), native-window runtime checks (document loaded, nonzero viewer layout, zoom/fit, rotation/undo, sidebar toggle). Runtime checks invoke controls programmatically; they do not prove keyboard, dialog, Finder integration, text search/highlight, or visual parity.
+GitHub macOS CI runs builds, XCTest, core smoke tests, release-gate tests, and bundle validation. The initial published source CI passed; the badge links to current results.
 
-`swift test` could not resolve XCTest with this Mac's command-line-tools installation. Equivalent core scenarios ran through `PreviewSmoke`, but XCTest results are unverified. SDK linker search-path warnings are present; builds succeed. CoreGraphics logs a PDF error during intentional invalid-file rejection. No screenshot or manual accessibility audit was performed.
+Local checks passed for core document edits/export, raster encoding/reload, OCR fixture recognition, permission guards, resource limits, source-file protection, edit-history state, PDF/TIFF native-window smoke, plist/signature validation, and DMG checksum/read-only mount inspection.
+
+The local command-line-tools installation could not resolve XCTest; GitHub CI with Xcode supplies that check. Native-window smoke invokes actions programmatically, not through manual keyboard/dialog interactions. Manual VoiceOver, clean-Mac Gatekeeper, minimum-OS compatibility, and full Apple Preview parity checks remain outstanding. Known local diagnostics include missing CommandLineTools linker search paths and CoreGraphics warnings on some fixtures.
+
+## Release status
+
+The GitHub DMG is an **experimental prerelease**, not a stable production release. Developer ID signing, notarization, sandbox-policy review, supported-OS testing, and manual QA remain release gates.
+
+- [Release readiness](RELEASE_READINESS.md)
+- [Signed/notarized release workflow](release/README.md)
+- [Experimental release notes](release/EXPERIMENTAL.md)
+
+Source publication and experimental binary publication do not establish production readiness.
+
+## Contributing and security
+
+Issues and focused pull requests are welcome. Read [Contributing](CONTRIBUTING.md) for development and test expectations.
+
+Report vulnerabilities through GitHub private vulnerability reporting; see [Security](SECURITY.md). Do not attach private documents or credentials to public issues. There is no guaranteed support or security-response timeframe.
+
+## Provenance and license
+
+Feature inventory was informed by local REA inspection of the installed Apple Preview 11.0 (1147) executable identity, document declarations, and shipped menu labels. No Apple implementation was decompiled. Those declarations do not prove runtime behavior; this application's architecture and implementation are independent. Raw Apple-derived research output is retained locally and excluded from the public repository.
+
+Original project source and documentation are licensed under [MIT](LICENSE). Apple frameworks, trademarks, and other third-party materials remain subject to their respective rights.
